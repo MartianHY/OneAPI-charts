@@ -1,0 +1,30 @@
+replicaCount: 1
+
+image:
+  repository: justsong/one-api
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3000
+
+persistence:
+  enabled: true
+  storageClassName: "rook-cephfs"
+  accessMode: ReadWriteOnce
+  size: 1Gi
+
+database:
+  type: mysql
+  mysql:
+    host: localhost
+    port: 3306
+    username: root
+    password: ""
+    dbname: oneapi
+
+env:
+  TZ: "Asia/Shanghai"
+  SQL_DSN: ""
+

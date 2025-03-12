@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: one-api
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 3000
+          env:
+            - name: TZ
+              value: {{ .Values.env.TZ }}
+            {{- if eq .Values.database.type "mysql" }}
+            - name: SQL_DSN
+              value: "{{ .Values.database.mysql.username }}:{{ .Values.database.mysql.password }}@tcp({{ .Values.database.mysql.host }}:{{ .Values.database.mysql.port }})/{{ .Values.database.mysql.dbname }}"
+            {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-pvc
+
